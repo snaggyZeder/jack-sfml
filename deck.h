@@ -11,7 +11,7 @@ private:
 public:
 	Deck(sf::Image&);
 	void shuffle();//перетасовать колоду
-	Card pop();//взять верхнюю карту
+	Card* pop();//взять верхнюю карту
 	void print_deck();//печать колоду
 	Card getCard(int);
 };

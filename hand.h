@@ -6,7 +6,7 @@
 class Hand {
 
 protected:
-	std::vector<Card> m_hand;
+	std::vector<Card*> m_hand;
 public:
 	enum GameStatus {
 		GAME_CONTINUE,

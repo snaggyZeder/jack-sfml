@@ -9,18 +9,11 @@ void Player::play(Deck& fDeck, sf::RenderWindow& window) {
 		//взять карту из колоды в руку
 		takeOneCard(fDeck);
 		//печатаем руку
-		/*if (calculateScore() <= 11 & Card::CardRank() == Card::CardRank::CARD_A) {
-			calculateScore + 10;
-		};*/
+		
+		
 		printHand();
 		drawHand(window);
-		//window.draw();
-		/*
-		*  window.draw(hero1.getSprite());//выводим спрайт
-			window.display();
-		*/
-		//выводим счет и просим пользователя принять решение
-		//о ходе игры (продолжить или нет)
+	
 
 		std::cout << "Your score is " << calculateScore() << std::endl;
 		if (calculateScore() >= 21) break;

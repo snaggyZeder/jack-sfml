@@ -8,13 +8,15 @@
 #include <SFML/Graphics.hpp>
 using namespace sf;
 int main() {
+
 	sf::RenderWindow window(sf::VideoMode(1024, 800), "SFML Works!");
 	Image image;
 	image.loadFromFile("imagess/deck.png");
 	Deck my_deck(image);
-	Card card1(image,CARD_2,CARD_DIAMONDS);
+ 
 	my_deck.shuffle();
-	my_deck.print_deck();
+	/*my_deck.print_deck();*/
+	Game my_game;
 	
 	while (window.isOpen())
 	{
@@ -30,17 +32,17 @@ int main() {
 		}
 
 
-		/*do {
-		 my_game.play(window);
-		 std::cout << "do yo want another game?" << std::endl;
+		
+		my_game.play(window, image);
+		/*std::cout << "do yo want another game?" << std::endl;
 		 std::cout << " (enter your choice, y - yes, n - no) ";
 		 std::cin >> choise;
-		} while (choise == 'y');
+
 		std::cout << "player wins:" << my_game.get_m_playerWon() << std::endl;
 		std::cout << "dealer wins:" << my_game.get_m_dealerWon() << std::endl;
-		std::cout << "draws:" << my_game.get_m_draw() << std::endl;*/
+		std::cout << "draws:" << my_game.get_m_draw() << std::endl;
 
-		my_deck.getCard(5).drawCard(window);
+		my_deck.getCard(5).drawCard(window);*/
 	 
 		window.display();
 	}
