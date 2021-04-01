@@ -1,17 +1,21 @@
 ﻿#pragma once
+
 #include "card.h"
 #include <vector>
-#include <fstream>
-#include <SFML/Graphics.hpp>
+#include <utility>
+
 class Deck {
-private:
+
 	const int deck_size = 52;
-	std::vector<Card*> m_deck;
-	 
+	std::vector<std::pair<CardSuits, CardRank>> m_deck;
+	const sf::Texture* m_texture;
+
 public:
-	Deck(sf::Image&);
-	void shuffle();//перетасовать колоду
-	Card* pop();//взять верхнюю карту
-	void print_deck();//печать колоду
-	Card getCard(int);
+	Deck();
+
+	void setTexture(const sf::Texture& texture);
+
+	void shuffle();//ďĺđĺňŕńîâŕňü ęîëîäó
+
+	Card pop();
 };

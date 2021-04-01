@@ -1,52 +1,56 @@
 ﻿#pragma once
-#include <iostream>
+
 #include <SFML/Graphics.hpp>
+
 enum CardSuits {
-	CARD_DIAMONDS,//бубны
-	CARD_HEARTS,//черви
-	CARD_SPADES,//пики
-	CARD_CLUBS,//крести
-	MAX_SUITS//конец перечисления
+	CARD_DIAMONDS,//áóáíű
+	CARD_HEARTS,//÷ĺđâč
+	CARD_SPADES,//ďčęč
+	CARD_CLUBS,//ęđĺńňč
+	MAX_SUITS//ęîíĺö ďĺđĺ÷čńëĺíč˙
 };
+
 enum CardRank {
 	CARD_A,//0
 	CARD_2,//1
 	CARD_3,//2
 	CARD_4,//3
-	CARD_5,
-	CARD_6,
-	CARD_7,
-	CARD_8,
-	CARD_9,
-	CARD_10,
-	CARD_J,
-	CARD_Q,
-	CARD_K,
-	MAX_RANK//конец перечисления
+	CARD_5,//4
+	CARD_6,//5
+	CARD_7,//6
+	CARD_8,//7
+	CARD_9,//8
+	CARD_10,//9
+	CARD_J,//10
+	CARD_Q,//11
+	CARD_K,//12
+	MAX_RANK//ęîíĺö ďĺđĺ÷čńëĺíč˙
 };
-class Card
+
+class Card : public sf::Drawable, public sf::Transformable
 {
-public:	
-	
-	Card(sf::Image&,CardRank, CardSuits);
-	void print_card();
-	int get_score();
-	CardRank get_rank();
-	CardSuits get_suit();
-	friend std::ostream& operator<<(std::ostream&, Card&);
-	sf::Sprite& getSprite();
-	float getWidth() { return cardWidth; }
-	float getHeight() { return cardHeight; }
-	void setX(float fx) { x = fx; }
-	void setY(float fy) { y = fy; }
-	void drawCard(sf::RenderWindow&);
+public:
+	Card(const sf::Texture* texture, CardRank rank, CardSuits suit);
+
+	int get_score() const;
+
+	CardRank get_rank() const;
+
+	CardSuits get_suit() const;
+
+	static float getWidth();
+
+	static float getHeight();
+
 private:
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
 	CardRank m_rank;
 	CardSuits m_suit;
-	float x, y;
-	static float cardWidth;
-	static float cardHeight;
-	sf::Texture cardTexture;
+
+	static int cardWidth;
+	static int cardHeight;
 
 	sf::Sprite cardSprite;
 };

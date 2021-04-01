@@ -1,49 +1,30 @@
-#include <iostream>
-#include "card.h"
-#include "deck.h"
-#include "game.h"
-#include "hand.h"
-#include "player.h"
-#include "dealer.h"
+п»ї#include "game.h"
 #include <SFML/Graphics.hpp>
-using namespace sf;
-int main() {
 
-	sf::RenderWindow window(sf::VideoMode(1024, 800), "SFML Works!");
-	Image image;
-	image.loadFromFile("imagess/deck.png");
-	Deck my_deck(image);
- 
-	my_deck.shuffle();
-	/*my_deck.print_deck();*/
+using namespace sf;
+
+int main() {
+	RenderWindow window(sf::VideoMode(1024, 800), "SFML Works!");
+	window.setFramerateLimit(60);
+
 	Game my_game;
-	
-	while (window.isOpen())
+
+	while (window.isOpen() && my_game.isRunning())
 	{
-		window.clear(Color(250, 220, 100, 0));
-		// Обрабатываем очередь событий в цикле
+		// ГЋГЎГ°Г ГЎГ ГІГ»ГўГ ГҐГ¬ Г®Г·ГҐГ°ГҐГ¤Гј Г±Г®ГЎГ»ГІГЁГ© Гў Г¶ГЁГЄГ«ГҐ
 		Event event;
 		while (window.pollEvent(event))
 		{
-			// Пользователь нажал на «крестик» и хочет закрыть окно?
-			if (event.type == sf::Event::Closed)
-				// тогда закрываем его
+			// ГЏГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гј Г­Г Г¦Г Г« Г­Г  В«ГЄГ°ГҐГ±ГІГЁГЄВ» ГЁ ГµГ®Г·ГҐГІ Г§Г ГЄГ°Г»ГІГј Г®ГЄГ­Г®?
+			if (event.type == Event::Closed)
+				// ГІГ®ГЈГ¤Г  Г§Г ГЄГ°Г»ГўГ ГҐГ¬ ГҐГЈГ®
 				window.close();
+			else if (event.type == Event::KeyReleased)
+				my_game.processInput(event.key.code);
 		}
-
-
-		
-		my_game.play(window, image);
-		/*std::cout << "do yo want another game?" << std::endl;
-		 std::cout << " (enter your choice, y - yes, n - no) ";
-		 std::cin >> choise;
-
-		std::cout << "player wins:" << my_game.get_m_playerWon() << std::endl;
-		std::cout << "dealer wins:" << my_game.get_m_dealerWon() << std::endl;
-		std::cout << "draws:" << my_game.get_m_draw() << std::endl;
-
-		my_deck.getCard(5).drawCard(window);*/
-	 
+		my_game.update();
+		window.clear(Color(250, 220, 100, 0));
+		window.draw(my_game);
 		window.display();
 	}
 }

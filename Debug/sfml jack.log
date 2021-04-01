@@ -1,2 +1,9 @@
-﻿  main.cpp
+﻿  card.cpp
+  dealer.cpp
+  deck.cpp
+  game.cpp
+  hand.cpp
+  main.cpp
+  player.cpp
+  Создание кода...
   sfml jack.vcxproj -> D:\sfml black jack\sfml jack\Debug\sfml jack.exe

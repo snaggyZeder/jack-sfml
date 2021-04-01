@@ -1,97 +1,133 @@
 ﻿#include "game.h"
-#include "player.h"
-#include "deck.h"
-#include <SFML/Graphics.hpp>
-Game::Game() {
-	m_playerWon = 0; m_dealerWon = 0; m_draw = 0;
-}
-int Game::get_m_playerWon() { return m_playerWon; }
-int Game::get_m_dealerWon() { return m_dealerWon; }
-int Game::get_m_draw() { return m_draw; }
-void Game::increase_playerWon() {
-	m_playerWon++;
-}
-void Game::increase_dealerWon() {
-	m_dealerWon++;
-}
-void Game::playersdraw() {
-	m_draw++;
+#include <iostream>
+
+Game::Game() : m_stage(Stage::NEW_GAME) {
+	m_player.move(0.0f, Card::getHeight() + 50.0f);
+	m_texture.loadFromFile("images/deck.png");
+	m_state.deck.setTexture(m_texture);
+	m_state.resieveInput = false;
+	m_state.userInput = 0;
 }
 
+void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	states.transform *= getTransform();
+	target.draw(m_dealer, states);
+	target.draw(m_player, states);
+}
+
+void Game::processInput(sf::Uint32 keyCode) {
+	if (m_state.resieveInput)
+		m_state.userInput = keyCode;
+}
+
+void Game::update() {
+	switch (m_stage) {
+	case Stage::NEW_GAME:
+		newGame();
+		break;
+	case Stage::FINISHED:
+		gameFinished();
+		break;
+	case Stage::PLAYER_TURN:
+		playerTurn();
+		break;
+	case Stage::DEALER_TURN:
+		dealerTurn();
+		break;
+	default:
+		;
+	}
+}
+
+bool Game::isRunning() const {
+	return m_stage != Stage::TERMINATE;
+}
 
 
-void Game::play(sf::RenderWindow& window,sf::Image& image) {
-	
-	Deck my_deck(image);//создаем колоду
-	my_deck.shuffle();//тусуем колоду
-	Player player1;//создаем игрока
-	Dealer dealer;//создаем дилера
-	Hand::GameStatus currentGameStatus = Hand::GAME_CONTINUE;
-	
-	
-		
+void Game::newGame() {
+	m_state.deck.shuffle();
 
-	player1.play(my_deck, window);
+	m_dealer.clear();
+	m_dealer.takeOneCard(m_state.deck.pop());
+	m_dealer.takeOneCard(m_state.deck.pop());
 
-	currentGameStatus = player1.checkGameStatus();
-	//проверяем как сыграл игрок
-	//набрал 21 - выиграл сразу
-	if (currentGameStatus == Hand::GAME_WIN) {
-			std::cout << "Player1 win!" << std::endl;
-			increase_playerWon();
-			return ;
+	m_player.clear();
+	m_player.takeOneCard(m_state.deck.pop());
+	m_player.takeOneCard(m_state.deck.pop());
+
+	m_stage = Stage::PLAYER_TURN;
+}
+
+void Game::gameFinished() {
+	if (m_state.resieveInput) {
+		switch (m_state.userInput) {
+		case sf::Keyboard::Y:
+			m_state.resieveInput = false;
+			std::cout << "Starting new game" << std::endl;
+			m_stage = Stage::NEW_GAME;
+			break;
+		case sf::Keyboard::N:
+			m_state.resieveInput = false;
+			m_stage = Stage::TERMINATE;
+			break;
+		default:
+			;
 		}
-	else
-	//перебор - срызу проиграл
-	if (currentGameStatus == Hand::GAME_LOSE) {
-		std::cout << "Player1 lose!" << std::endl;
-		increase_dealerWon();
-		return;
+		m_state.userInput = 0;
 	}
-	else
-		//игрок набрал меньше 21 очка, играет дилер
-	if (currentGameStatus == Hand::GAME_CONTINUE) {
-		//дилер набирает карты в руку
-		dealer.play(my_deck);
-		currentGameStatus = dealer.checkGameStatus();
-		//проверяем, как сыграл дилер
-		//если дилер набрал от 17 до 20 очков
-	if (currentGameStatus == Hand::GAME_CONTINUE) {
-			//вычисляем очки игрока и дилера
-			int playerScore = player1.calculateScore();
-			int dealerSCore = dealer.calculateScore();
-			//у игрока больше очков - победил игрок
-	if (playerScore > dealerSCore) {
-		    std::cout << "Player1 win!" << std::endl;
-		    increase_playerWon();
-		    return;
-				}
-		    //у дилера больше - победил дилер
-	if (dealerSCore > playerScore) {
-			std::cout << "Dealer win!" << std::endl;
-			increase_dealerWon();
-			return;
-				}
-		    //поровну - ничья
-	if (dealerSCore == playerScore) {
+	else {
+		std::cout << "Restart? (y/n)" << std::endl;
+		m_state.resieveInput = true;
+	}
+}
+
+void Game::playerTurn() {
+	switch (m_player.getStatus()) {
+	case Hand::GAME_CONTINUE:
+		std::cout << "Your score: " << m_player.getScore()
+			<< " More? (y/n)" << std::endl;
+		break;
+	case Hand::GAME_LOSE:
+		std::cout << "Your score: " << m_player.getScore()
+			<< " You lose!" << std::endl;
+		m_stage = Stage::FINISHED;
+		break;
+	case Hand::GAME_WIN:
+		std::cout << "Your score: 21 You won!" << std::endl;
+		m_stage = Stage::FINISHED;
+		break;
+	case Hand::GAME_PASS:
+		m_stage = Stage::DEALER_TURN;
+		break;
+	default:
+		;
+	}
+	m_player.update(m_state);
+}
+
+void Game::dealerTurn() {
+	switch (m_dealer.getStatus()) {
+	case Hand::GAME_LOSE:
+		std::cout << "Dealer score: " << m_dealer.getScore()
+			<< " You won!" << std::endl;
+		m_stage = Stage::FINISHED;
+		break;
+	case Hand::GAME_WIN:
+		std::cout << "Dealer won! Score: 21" << std::endl;
+		m_stage = Stage::FINISHED;
+		break;
+	case Hand::GAME_PASS:
+		std::cout << "Dealer score: " << m_dealer.getScore() << std::endl;
+		if (m_dealer.getScore() < m_player.getScore())
+			std::cout << "You won!" << std::endl;
+		else if (m_dealer.getScore() == m_player.getScore())
 			std::cout << "Draw!" << std::endl;
-			playersdraw();
-			return;
-				}
-			}
-	else
-			//у дилера 21 очков - сразу выигрыш
-	if (currentGameStatus == Hand::GAME_WIN) {
-		std::cout << "Dealer win!" << std::endl;
-		increase_dealerWon();
-		return;
-				}
-	else
-		   //у дилера перебор - сразу проигрыш
-	if (currentGameStatus == Hand::GAME_LOSE) {
-		std::cout << "Dealer lose!" << std::endl;
-		increase_playerWon();
-		return;
-		 }
+		else
+			std::cout << "Dealer won!" << std::endl;
+		m_stage = Stage::FINISHED;
+		break;
+	default:
+		;
 	}
+	m_dealer.update(m_state);
 }

@@ -1,25 +1,24 @@
 ﻿#include "player.h"
-#include <iostream>
-void Player::play(Deck& fDeck, sf::RenderWindow& window) {
-	char choice = 'y';
-	std::cout << std::endl;
-	std::cout << "YOUR MOVE";
-	std::cout << std::endl;
-	while (choice != 'n') {
-		//взять карту из колоды в руку
-		takeOneCard(fDeck);
-		//печатаем руку
-		
-		
-		printHand();
-		drawHand(window);
-	
+#include "game.h"
 
-		std::cout << "Your score is " << calculateScore() << std::endl;
-		if (calculateScore() >= 21) break;
-		std::cout << "Do you want another card?";
-		std::cout << " (enter your choice, y - yes, n - no) ";
-		//считываем выбор пользователя
-		std::cin >> choice;
+void Player::update(GameState& state) {
+	if (state.resieveInput) {
+		switch (state.userInput) {
+		case sf::Keyboard::Y:
+			state.resieveInput = false;
+			takeOneCard(state.deck.pop());
+			break;
+		case sf::Keyboard::N:
+			state.resieveInput = false;
+			m_status = GAME_PASS;
+			break;
+		default:
+			;
+		}
+		state.userInput = 0;
+	}
+	else if (m_status == GAME_CONTINUE) {
+		m_status = GAME_WAIT;
+		state.resieveInput = true;
 	}
 }
